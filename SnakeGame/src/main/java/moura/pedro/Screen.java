@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class Screen extends JPanel implements ActionListener {
@@ -14,12 +16,12 @@ public class Screen extends JPanel implements ActionListener {
     public static final int BREAK = 200;
     public static final String FONT_NAME = "Ink Free";
     private final int [] axleX = new int[UNITS];
-    private final int [] axley = new int[UNITS];
+    private final int [] axleY = new int[UNITS];
     private int BodySnake = 6;
     private int BlockEaten;
     private int blockX;
     private int blockY;
-    private char direction = 'R'; // U - 'UP', L - 'LOW', R - 'RIGHT', L 'LEFT'
+    private char direction = 'R'; // U - 'UP', D - 'DOWN', R - 'RIGHT', L 'LEFT'
     private boolean status = false;
     Timer timer;
     Random random;
@@ -28,8 +30,9 @@ public class Screen extends JPanel implements ActionListener {
     Screen() {
         random = new Random ();
         setPreferredSize(new Dimension(WIDTH_SCREEN, HEIGHT_SCREEN));
-        setBackground(new Color (187, 255, 185));
+        setBackground(new Color (215, 255, 215));
         setFocusable(true);
+        addKeyListener(new KeyReaderAdapter ());
         startGame ();
     }
 
@@ -52,10 +55,10 @@ public class Screen extends JPanel implements ActionListener {
             for (int i = 0; i < BodySnake; i++){
                 if (i == 0){
                     g.setColor(Color.GREEN);
-                    g.fillRect(axleX[0], axley[0], BLOCK_SIZE, BLOCK_SIZE);
+                    g.fillRect(axleX[0], axleY[0], BLOCK_SIZE, BLOCK_SIZE);
                 }else{
                     g.setColor(new Color(66, 220, 10));
-                    g.fillRect(axleX[i], axley[i], BLOCK_SIZE,BLOCK_SIZE);
+                    g.fillRect(axleX[i], axleY[i], BLOCK_SIZE,BLOCK_SIZE);
                 }
             }
             g.setColor(Color.RED);
@@ -84,8 +87,67 @@ public class Screen extends JPanel implements ActionListener {
         g.drawString("\uD83D\uDE1D End Game.", (WIDTH_SCREEN - fonteFinal.stringWidth("End Game")) / 2, HEIGHT_SCREEN/ 2);
     }
 
-    @Override
     public void actionPerformed(ActionEvent e) {
+        if (status){
+            walk ();
+        }
+        repaint();
+    }
+
+    private void walk (){
+        for (int i = BodySnake; i > 0; i--){
+            axleX[i] = axleX[i - 1];
+            axleY[i] = axleY[i - 1];
+        }
+
+        switch (direction){
+            case 'U':
+                axleY[0] = axleY[0] - BLOCK_SIZE;
+                break;
+            case 'D':
+                axleY[0] = axleY[0] + BLOCK_SIZE;
+                break;
+            case 'L':
+                axleX[0] = axleX[0] - BLOCK_SIZE;
+                break;
+            case 'R':
+                axleX[0] = axleX[0] + BLOCK_SIZE;
+                break;
+        }
+    }
+
+
+    public class KeyReaderAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_LEFT:
+                    if (direction != 'L') {
+                        direction = 'L';
+                    }
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if (direction != 'R') {
+                        direction = 'R';
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    if (direction != 'U') {
+                        direction = 'U';
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if (direction != 'D') {
+                        direction = 'D';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
     }
 }
+
+
