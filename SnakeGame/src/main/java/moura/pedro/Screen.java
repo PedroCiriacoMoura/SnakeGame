@@ -49,7 +49,7 @@ public class Screen extends JPanel implements ActionListener {
     }
     public void paintScreen (Graphics g){
         if (status) {
-            g.setColor(Color.DARK_GRAY);
+            g.setColor(Color.RED);
             g.fillOval(blockX, blockY, BLOCK_SIZE, BLOCK_SIZE);
 
             for (int i = 0; i < BodySnake; i++){
@@ -61,10 +61,13 @@ public class Screen extends JPanel implements ActionListener {
                     g.fillRect(axleX[i], axleY[i], BLOCK_SIZE,BLOCK_SIZE);
                 }
             }
-            g.setColor(Color.RED);
-            g.setFont(new Font(FONT_NAME, Font.BOLD, 0));
-            FontMetrics metrics = getFontMetrics((g.getFont()));
-            g.drawString ("Points: " + BlockEaten, (BLOCK_SIZE - metrics.stringWidth("Points: " + BlockEaten)) / 2, g.getFont().getSize());
+            g.setColor(Color.red);
+            g.setFont(new Font(FONT_NAME, Font.BOLD, 40));
+            FontMetrics fontePontuacao = getFontMetrics(g.getFont());
+            g.drawString("Points: " + BlockEaten, (WIDTH_SCREEN - fontePontuacao.stringWidth("Points: " + BlockEaten)) / 2, g.getFont().getSize());
+            g.setColor(Color.red);
+            g.setFont(new Font(FONT_NAME, Font.BOLD, 75));
+            FontMetrics fonteFinal = getFontMetrics(g.getFont());
         }else{
             endGame(g);
         }
@@ -84,12 +87,14 @@ public class Screen extends JPanel implements ActionListener {
         g.setColor(Color.red);
         g.setFont(new Font(FONT_NAME, Font.BOLD, 75));
         FontMetrics fonteFinal = getFontMetrics(g.getFont());
-        g.drawString("\uD83D\uDE1D End Game.", (WIDTH_SCREEN - fonteFinal.stringWidth("End Game")) / 2, HEIGHT_SCREEN/ 2);
+        g.drawString("GAME OVER :/", (WIDTH_SCREEN - fonteFinal.stringWidth("End Game")) / 2, HEIGHT_SCREEN/ 2);
     }
 
     public void actionPerformed(ActionEvent e) {
         if (status){
             walk ();
+            reackBlock();
+            validateLimits ();
         }
         repaint();
     }
@@ -116,6 +121,34 @@ public class Screen extends JPanel implements ActionListener {
         }
     }
 
+    public  void reackBlock (){
+        if (axleX[0] == blockX && axleY[0] == blockY){
+            BodySnake++;
+            BlockEaten++;
+            createBlock();
+        }
+
+        if (axleX[0] < 0 || axleY[0] > WIDTH_SCREEN){
+            status = false;
+        }
+
+        if (axleY[0] < 0 || axleY[0] > HEIGHT_SCREEN){
+            status = false;
+        }
+
+        if (!status){
+            timer.stop();
+        }
+    }
+
+    public void validateLimits (){
+        for (int i = BodySnake; i >0; i--){
+            if (axleX[0] == axleX[i] && axleY[0] == axleY[i]){
+                status = false;
+                break;
+            }
+        }
+    }
 
     public class KeyReaderAdapter extends KeyAdapter {
 
